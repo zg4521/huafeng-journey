@@ -176,6 +176,15 @@
     font-weight: 700; letter-spacing: 0.15em;
     color: rgba(255,255,255,0.85);
     text-shadow: 0 2px 12px rgba(0,0,0,0.5);
+    margin-bottom: clamp(6px, 1.2vh, 12px);
+  }
+  .team-logo {
+    display: block;
+    width: clamp(120px, 16vw, 220px);
+    height: auto;
+    margin: 0 auto;
+    opacity: 0.55;
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4)) saturate(1.6) brightness(0.85);
   }
 
   .bottom-hint {
@@ -281,7 +290,7 @@
   <canvas id="snowCanvas"></canvas>
 </div>
 
-<div class="title-area"><h1>聚心队来到华峰的征程</h1></div>
+<div class="title-area"><h1>聚心队来到华峰的征程</h1><img class="team-logo" src="队标.png" alt="队标"></div>
 <div class="bottom-hint">点击光点 · 了解华峰的每一步</div>
 <div class="flash" id="flash"></div>
 <div class="warp-overlay" id="warpOverlay">
