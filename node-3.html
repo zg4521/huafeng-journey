@@ -93,13 +93,13 @@
   }
   .photo-counter {
     position: absolute;
-    bottom: 12px;
-    right: 14px;
+    bottom: clamp(6px, 1.5vh, 14px);
+    right: clamp(8px, 2vw, 16px);
     background: rgba(0,0,0,0.55);
     color: rgba(255,255,255,0.7);
-    padding: 3px 10px;
+    padding: clamp(2px, 0.5vh, 4px) clamp(6px, 1.2vw, 12px);
     border-radius: 10px;
-    font-size: 0.7rem;
+    font-size: clamp(0.6rem, 0.9vw, 0.75rem);
     letter-spacing: 0.06em;
     z-index: 2;
     pointer-events: none;
@@ -111,7 +111,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 30px;
+    padding: clamp(14px, 3vw, 30px);
   }
   .typing-box {
     max-width: clamp(280px, 48vw, 540px);

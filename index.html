@@ -148,7 +148,7 @@
   .warp-overlay.active { pointer-events: all; opacity: 1; }
   .warp-bg { position: absolute; inset: 0; background: radial-gradient(circle, #0b1428 0%, #000 100%); }
   .warp-vortex {
-    width: 80px; height: 80px; border-radius: 50%;
+    width: clamp(50px, 8vmin, 100px); height: clamp(50px, 8vmin, 100px); border-radius: 50%;
     background: radial-gradient(circle,
       rgba(255,255,255,0.95) 0%, rgba(140,200,255,0.7) 20%,
       rgba(50,110,220,0.4) 50%, transparent 70%);
@@ -168,7 +168,7 @@
 
   /* ===== UI ===== */
   .title-area {
-    position: fixed; top: 28px; left: 0; right: 0;
+    position: fixed; top: clamp(14px, 3.5vh, 30px); left: 0; right: 0;
     text-align: center; z-index: 15; pointer-events: none;
   }
   .title-area h1 {
@@ -179,9 +179,9 @@
   }
 
   .bottom-hint {
-    position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+    position: fixed; bottom: clamp(14px, 3.5vh, 30px); left: 50%; transform: translateX(-50%);
     z-index: 15; pointer-events: none;
-    font-size: 0.7rem; letter-spacing: 0.12em;
+    font-size: clamp(0.6rem, 1vw, 0.75rem); letter-spacing: 0.12em;
     color: rgba(255,255,255,0.4);
     animation: hintFade 3s ease-in-out infinite;
   }
