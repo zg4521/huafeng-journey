@@ -215,7 +215,7 @@
 <div class="bg-layer bg-stars"></div>
 
 <div class="page-title"><h1>华峰的地标</h1></div>
-<a href="mountain-journey.html" class="back-btn">← 返回华峰征程</a>
+<a href="index.html" class="back-btn">← 返回华峰征程</a>
 
 <!-- Main row: cube + text panel -->
 <div class="main-row">
@@ -331,10 +331,10 @@
     if (e.key === 'ArrowRight') { e.preventDefault(); step(1); }
   });
 
-  const scene = document.getElementById('cubeScene');
+  const sceneEl = document.getElementById('cubeScene');
   let touchX = 0;
-  scene.addEventListener('touchstart', (e) => { touchX = e.touches[0].clientX; });
-  scene.addEventListener('touchend', (e) => {
+  sceneEl.addEventListener('touchstart', (e) => { touchX = e.touches[0].clientX; });
+  sceneEl.addEventListener('touchend', (e) => {
     const dx = e.changedTouches[0].clientX - touchX;
     if (Math.abs(dx) > 50) step(dx > 0 ? -1 : 1);
   });
