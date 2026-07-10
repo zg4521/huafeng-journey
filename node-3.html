@@ -65,8 +65,8 @@
     flex: 0 0 50%;
     display: flex;
     align-items: center;
-    justify-content: center;
-    padding: clamp(14px, 3vw, 30px);
+    justify-content: flex-end;
+    padding: clamp(14px, 3vw, 30px) clamp(8px, 1vw, 14px) clamp(14px, 3vw, 30px) clamp(14px, 3vw, 30px);
   }
   .photo-frame {
     position: relative;
@@ -86,10 +86,17 @@
     height: 100%;
     object-fit: cover;
     opacity: 0;
-    transition: opacity 0.8s ease;
+    z-index: 1;
+    transition: none;
   }
   .photo-frame img.active {
     opacity: 1;
+    z-index: 2;
+  }
+  .photo-frame img.exiting {
+    opacity: 0;
+    z-index: 3;
+    transition: opacity 0.8s ease;
   }
   .photo-counter {
     position: absolute;
@@ -110,8 +117,8 @@
     flex: 0 0 50%;
     display: flex;
     align-items: center;
-    justify-content: center;
-    padding: clamp(14px, 3vw, 30px);
+    justify-content: flex-start;
+    padding: clamp(14px, 3vw, 30px) clamp(14px, 3vw, 30px) clamp(14px, 3vw, 30px) clamp(8px, 1vw, 14px);
   }
   .typing-box {
     max-width: clamp(280px, 48vw, 540px);
@@ -135,9 +142,9 @@
   }
   .typing-cursor {
     display: inline-block;
-    width: 2px;
+    width: 0;
     height: 1.1em;
-    background: rgba(255,255,255,0.7);
+    border-left: 2px solid rgba(255,255,255,0.7);
     margin-left: 2px;
     vertical-align: text-bottom;
     animation: blink 0.8s step-end infinite;
@@ -161,6 +168,7 @@
     }
     .photo-panel, .content-panel {
       flex: 0 0 auto;
+      justify-content: center;
       padding: clamp(10px, 2vw, 16px) clamp(12px, 3vw, 20px);
     }
     .photo-frame {
@@ -180,7 +188,7 @@
 <canvas id="particles"></canvas>
 
 <div class="page-title"><h1>职场前辈的锦囊</h1></div>
-<a href="index.html" class="back-btn">← 返回华峰征程</a>
+<a href="index.html" class="back-btn">← 返回</a>
 
 <div class="main-row">
 
@@ -227,34 +235,61 @@
   const frame = document.getElementById('photoFrame');
   const counter = document.getElementById('photoCounter');
 
-  // Create img elements
-  const imgs = photos.map((src, i) => {
-    const img = document.createElement('img');
+  // Preload all images before starting (handle cached images)
+  let loadedCount = 0;
+  const total = photos.length;
+  const domImgs = [];
+
+  photos.forEach((src, i) => {
+    const img = new Image();
+    let done = false;
+    function handleReady() {
+      if (done) return;
+      done = true;
+      loadedCount++;
+      if (loadedCount >= total) startSlideshow();
+    }
+    img.onload = handleReady;
+    img.onerror = handleReady;
     img.src = src;
-    img.alt = '锦囊 ' + (i + 1);
-    if (i === 0) img.classList.add('active');
-    frame.insertBefore(img, counter);
-    return img;
+    if (img.complete) handleReady();
+    // Create DOM placeholder
+    const el = document.createElement('img');
+    el.src = src;
+    el.alt = '锦囊 ' + (i + 1);
+    if (i === 0) el.classList.add('active');
+    frame.insertBefore(el, counter);
+    domImgs.push(el);
   });
 
   let current = 0;
-  const total = photos.length;
+  let started = false;
 
   function updateCounter() {
     counter.textContent = (current + 1) + ' / ' + total;
   }
 
   function nextPhoto() {
-    imgs[current].classList.remove('active');
+    const old = current;
     current = (current + 1) % total;
-    imgs[current].classList.add('active');
+    // New image appears instantly at full opacity (no transition)
+    domImgs[current].classList.add('active');
+    // Old image fades out on top
+    domImgs[old].classList.add('exiting');
+    domImgs[old].classList.remove('active');
+    // Clean up after fade completes
+    setTimeout(() => {
+      domImgs[old].classList.remove('exiting');
+    }, 900);
     updateCounter();
   }
 
-  updateCounter();
-
-  // Auto-switch every 3 seconds
-  setInterval(nextPhoto, 3000);
+  function startSlideshow() {
+    if (started) return;
+    started = true;
+    updateCounter();
+    setInterval(nextPhoto, 3000);
+  }
 
   // Particles
   const canvas = document.getElementById('particles');
@@ -283,17 +318,17 @@
 
   // ===== Typing effect =====
   const messages = [
-    "一、从校园到职场——角色转变\n\n锦囊：新人培养重在三变：关系从同学到同事，态度从被管到主动担责，行为从随性到守纪。让新人从小事做起打牢基础。强调知识须落地、复盘才能提升。企业要的是实干者，不是空谈者。\n\n心得：称呼\"前辈\"不是客套，是规矩。\"对不起\"不表礼貌而是代价。心里有压力也有方向。从小事做起让人踏实，每次复盘都有新发现。想把\"知道\"变成\"做到\"。",
+    "新人培养重在三变：关系从同学到同事，态度从被管到主动担责，行为从随性到守纪。让新人从小事做起打牢基础。强调知识须落地、复盘才能提升。企业要的是实干者，不是空谈者。\n\n称呼\"前辈\"不是客套，是规矩。\"对不起\"不表礼貌而是代价。心里有压力也有方向。从小事做起让人踏实，每次复盘都有新发现。想把\"知道\"变成\"做到\"。",
 
-    "二、AI赋能设备管理\n\n锦囊：AI赋能设备管理分两步推进：现阶段在关键点位部署传感器，依托预测功能实现故障预判；未来引入AI眼镜，输入故障描述即可调取维修方案。核心逻辑：用数据替代经验判断，用智能缩短维修链路。\n\n心得：以前修设备全靠经验，现在AI能提前预警，心里更有底了。期待AI眼镜这个工具，遇到没见过的故障不用翻手册、不用等师傅，直接说出症状就有方案。技术让维修更有章法，不是空话。",
+    "AI赋能设备管理分两步推进：现阶段在关键点位部署传感器，依托预测功能实现故障预判；未来引入AI眼镜，输入故障描述即可调取维修方案。核心逻辑：用数据替代经验判断，用智能缩短维修链路。\n\n以前修设备全靠经验，现在AI能提前预警，心里更有底了。期待AI眼镜这个工具，遇到没见过的故障不用翻手册、不用等师傅，直接说出症状就有方案。技术让维修更有章法，不是空话。",
 
-    "三、AI大模型与自动化产线融合\n\n锦囊：AI大模型与自动化产线的融合点在于\"预判式干预\"。以双螺杆挤出机为突破口，盯住启停副料损耗这个真痛点，用AI提前5-10分钟预警异常工况，变\"被动抢修\"为\"主动防护\"，降本增效逻辑清晰，方案已进入落地阶段。\n\n心得：每次非计划停机都意味着大量废料，心疼但没办法。现在AI能提前十分钟预警，不是冷冰冰的数字，是真的帮我们把损失挡在发生之前。以前靠运气，以后靠算法。",
+    "AI大模型与自动化产线的融合点在于\"预判式干预\"。以双螺杆挤出机为突破口，盯住启停副料损耗这个真痛点，用AI提前5-10分钟预警异常工况，变\"被动抢修\"为\"主动防护\"，降本增效逻辑清晰，方案已进入落地阶段。\n\n每次非计划停机都意味着大量废料，心疼但没办法。现在AI能提前十分钟预警，不是冷冰冰的数字，是真的帮我们把损失挡在发生之前。以前靠运气，以后靠算法。",
 
-    "四、思维方法与沟通协作\n\n锦囊：用人看\"解决问题思维\"：主动拆解需求、深入底层逻辑、用数据说话。汇报遵循\"论点-数据-方案-资源\"逻辑，给领导选择题而非问答题。跨部门协作要站在共同目标上化解分歧，主动牵头但先对齐直属领导。量化工作，闭环落地。\n\n心得：不再等指令，学着拆问题、拿方案。被批评先稳住复盘，不隐瞒反而更被信任。汇报用数据、给选项，沟通顺畅很多。帮别人就是铺自己的路，跨部门换位思考后事情没那么难了。",
+    "用人看\"解决问题思维\"：主动拆解需求、深入底层逻辑、用数据说话。汇报遵循\"论点-数据-方案-资源\"逻辑，给领导选择题而非问答题。跨部门协作要站在共同目标上化解分歧，主动牵头但先对齐直属领导。量化工作，闭环落地。\n\n不再等指令，学着拆问题、拿方案。被批评先稳住复盘，不隐瞒反而更被信任。汇报用数据、给选项，沟通顺畅很多。帮别人就是铺自己的路，跨部门换位思考后事情没那么难了。",
 
-    "五、成长规划与AI研发布局\n\n锦囊：研发人才三年梯度培养：通盘打基、独立扛项、开拓新域。定期复盘加速成长。选人看重靠谱胜过聪明，专业硬还得善沟通。AI研发根基在高质量数据，纸质电子化是前提。未来需要既懂化工又通AI的复合人才。\n\n心得：三年路径让方向清晰了，第一年踏实学不焦虑。每周复盘花时间但思路更清楚。实验记录电子化开始嫌烦，想想AI要靠它做预测就理解了。跨界学计算机挺难，但知道是趋势，希望AI把重复劳动替掉，自己多做创造性的事。",
+    "研发人才三年梯度培养：通盘打基、独立扛项、开拓新域。定期复盘加速成长。选人看重靠谱胜过聪明，专业硬还得善沟通。AI研发根基在高质量数据，纸质电子化是前提。未来需要既懂化工又通AI的复合人才。\n\n三年路径让方向清晰了，第一年踏实学不焦虑。每周复盘花时间但思路更清楚。实验记录电子化开始嫌烦，想想AI要靠它做预测就理解了。跨界学计算机挺难，但知道是趋势，希望AI把重复劳动替掉，自己多做创造性的事。",
 
-    "六、华峰集团访谈与培训心得\n\n锦囊：用高薪酬撬动高产出——多发10万换回80万价值，5人干10人的活拿10人的钱，人效和幸福感双赢。选人重可塑性强的新人，推动管理转型。要求新人多跑现场、拥抱数字化，将个人成长嵌入集团战略。\n\n心得：破冰让我明白：主动担责比退缩更高效。军训唤醒了自律，展厅看到了科研拼搏精神。\"义利并举\"是价值观锚点。培训让我对数字化、AI有了期待，职业规划课坚定了深耕专业的决心。华峰大家庭不是口号，是真实感受。",
+    "用高薪酬撬动高产出——多发10万换回80万价值，5人干10人的活拿10人的钱，人效和幸福感双赢。选人重可塑性强的新人，推动管理转型。要求新人多跑现场、拥抱数字化，将个人成长嵌入集团战略。\n\n破冰让我明白：主动担责比退缩更高效。军训唤醒了自律，展厅看到了科研拼搏精神。\"义利并举\"是价值观锚点。培训让我对数字化、AI有了期待，职业规划课坚定了深耕专业的决心。华峰大家庭不是口号，是真实感受。",
   ];
 
   const typingContent = document.getElementById('typingContent');
